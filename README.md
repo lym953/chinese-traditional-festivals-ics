@@ -101,7 +101,7 @@ https://yangh9.github.io/ChinaCalendar/cal_festival.ics
 CI 里有一道校验，输出文件如果混进了标题含"纪念日/国庆/建军/劳动节/元旦"等字样的
 事件，构建直接失败。
 
-### 为什么需要每周更新
+### 为什么需要定期更新
 
 iCalendar 的 `RRULE`（重复规则）**只支持公历**。像国庆节可以写成
 `RRULE:FREQ=YEARLY` 一劳永逸，但七夕（农历七月初七）、上巳（三月初三）、
