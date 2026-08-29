@@ -2,8 +2,10 @@ name: Update calendar
 
 on:
   schedule:
-    # 每周一 03:17 UTC。GitHub 的 cron 在高峰期会延迟，对周更无影响。
-    - cron: '17 3 * * 1'
+    # 每月 1 号和 15 号 03:17 UTC。
+    # 间隔约 16 天，为 60 天停用规则留足余量——GitHub 的 cron 在高峰期
+    # 会延迟甚至跳过，纯月更一旦跳过一次就可能超过 60 天（如 7/1→9/1 是 62 天）。
+    - cron: '17 3 1,15 * *'
   workflow_dispatch:
 
 permissions:
@@ -44,7 +46,7 @@ jobs:
           echo "校验通过: $(grep -c '^BEGIN:VEVENT' $f) 条事件"
 
       - name: 写入时间戳
-        # 每周都产生一个 commit，让仓库的 60 天活动计时器永远不到期。
+        # 每次运行都产生一个 commit，让仓库的 60 天活动计时器永远不到期。
         # GitHub 会停用 public 仓库中 60 天无 commit 的定时工作流。
         run: date -u +'%Y-%m-%dT%H:%M:%SZ' > LAST_RUN
 

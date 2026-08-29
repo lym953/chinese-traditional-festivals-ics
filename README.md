@@ -69,11 +69,11 @@ https://yangh9.github.io/ChinaCalendar/cal_festival.ics
 ## 工作原理
 
 ```
-上游 cal_festival.ics  ──每周一──▶  scripts/filter.py  ──▶  docs/cal_traditional.ics
-      (208 条)                        白名单过滤              (62 条)
+上游 cal_festival.ics  ──每月两次──▶  scripts/filter.py  ──▶  docs/cal_traditional.ics
+      (208 条)                          白名单过滤              (62 条)
 ```
 
-[`.github/workflows/update.yml`](.github/workflows/update.yml) 每周一抓取上游、
+[`.github/workflows/update.yml`](.github/workflows/update.yml) 在每月 1 号和 15 号抓取上游、
 重新过滤、校验后提交。GitHub Pages 从 `docs/` 目录发布。
 
 白名单是**显式**的（见 [`scripts/filter.py`](scripts/filter.py) 的 `KEEP_PREFIXES`）：
@@ -97,6 +97,13 @@ iCalendar 的 `RRULE`（重复规则）**只支持公历**。像国庆节可以�
 `LAST_RUN` 每次运行都会更新并提交。这不是多余的 —— GitHub 会**停用 public 仓库中
 60 天没有新 commit 的定时工作流**，且只有 commit 能重置计时器。上游一年才更新几次，
 没有这个文件的话，工作流会在最需要它之前被悄悄关掉。
+
+跑「每月两次」而不是「每月一次」也是为此：GitHub 的 cron 在高峰期会延迟甚至跳过，
+纯月更一旦跳过一次就可能超过 60 天（7/1 到 9/1 是 62 天）。每月两次的间隔约 16 天，
+连续跳过两三次仍有余量，同时把时间戳 commit 控制在一年 24 个。
+
+万一还是被停用了，GitHub 会先发邮件通知，在 `Actions › Update calendar › Enable workflow`
+一键恢复即可；也可以随时用 `workflow_dispatch` 手动触发一次。
 
 ## 本地运行
 
