@@ -35,6 +35,16 @@
     padding: .9rem 1rem; overflow-x: auto;
   }
   h2 { font-size: 1.15rem; margin: 2.75rem 0 .75rem; }
+  .copy-row { display: flex; gap: .5rem; align-items: stretch; }
+  .copy-row pre { flex: 1; margin: 0; min-width: 0; }
+  #copy-btn {
+    flex: none; min-width: 4.5rem; min-height: 2.75rem; padding: 0 1rem;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--card);
+    color: var(--fg); font: inherit; font-size: .875rem; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  #copy-btn.done { border-color: var(--accent); color: var(--accent); }
   table { border-collapse: collapse; width: 100%; }
   td { border-top: 1px solid var(--line); padding: .6rem .5rem .6rem 0; vertical-align: top; }
   td:first-child { color: var(--muted); white-space: nowrap; width: 5.5rem; }
@@ -51,7 +61,10 @@
   <p><a class="btn" href="webcal://lym953.github.io/chinese-traditional-festivals-ics/cal_traditional.ics">一键订阅</a></p>
 
   <h2>手动添加</h2>
-  <pre>https://lym953.github.io/chinese-traditional-festivals-ics/cal_traditional.ics</pre>
+  <div class="copy-row">
+    <pre id="feed-url">https://lym953.github.io/chinese-traditional-festivals-ics/cal_traditional.ics</pre>
+    <button id="copy-btn" type="button" aria-label="复制订阅地址">复制</button>
+  </div>
   <p class="sub" style="margin:.5rem 0 0">
     Apple Calendar：<code>文件 &gt; 新建日历订阅…</code> ·
     Google Calendar：<code>其他日历 + &gt; 通过网址</code>
@@ -78,5 +91,51 @@
     <a href="https://github.com/lym953/chinese-traditional-festivals-ics">源码</a>
   </footer>
 </main>
+<script>
+(function () {
+  var btn = document.getElementById('copy-btn');
+  var url = document.getElementById('feed-url').textContent.trim();
+
+  function flash(text) {
+    btn.textContent = text;
+    btn.classList.add('done');
+    setTimeout(function () {
+      btn.textContent = '复制';
+      btn.classList.remove('done');
+    }, 1800);
+  }
+
+  // 旧版浏览器 / 非安全上下文的回退。readonly 可避免 iOS 弹出键盘。
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+    document.body.appendChild(ta);
+    var range = document.createRange();
+    range.selectNodeContents(ta);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    sel.removeAllRanges();
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  btn.addEventListener('click', function () {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(
+        function () { flash('已复制'); },
+        function () { flash(legacyCopy(url) ? '已复制' : '复制失败'); }
+      );
+    } else {
+      flash(legacyCopy(url) ? '已复制' : '复制失败');
+    }
+  });
+})();
+</script>
 </body>
 </html>
