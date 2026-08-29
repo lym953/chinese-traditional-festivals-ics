@@ -1,0 +1,57 @@
+name: Update calendar
+
+on:
+  schedule:
+    # 每周一 03:17 UTC。GitHub 的 cron 在高峰期会延迟，对周更无影响。
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-calendar
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 抓取上游
+        run: |
+          curl -fsSL --retry 3 --retry-delay 5 --max-time 60 \
+            -o upstream.ics \
+            https://yangh9.github.io/ChinaCalendar/cal_festival.ics
+          grep -q '^BEGIN:VCALENDAR' upstream.ics
+          echo "上游事件数: $(grep -c '^BEGIN:VEVENT' upstream.ics)"
+
+      - name: 过滤
+        run: python scripts/filter.py upstream.ics docs/cal_traditional.ics
+
+      - name: 校验输出
+        run: |
+          f=docs/cal_traditional.ics
+          [ "$(grep -c '^BEGIN:VEVENT' $f)" -eq "$(grep -c '^END:VEVENT' $f)" ]
+          [ "$(grep -c '^BEGIN:VEVENT' $f)" -gt 0 ]
+          # 现代纪念日一条都不该漏进来
+          ! grep -q '^SUMMARY:.*\(纪念日\|国庆\|建军\|劳动节\|元旦\|爱耳\|慈善\)' $f
+          echo "校验通过: $(grep -c '^BEGIN:VEVENT' $f) 条事件"
+
+      - name: 写入时间戳
+        # 每周都产生一个 commit，让仓库的 60 天活动计时器永远不到期。
+        # GitHub 会停用 public 仓库中 60 天无 commit 的定时工作流。
+        run: date -u +'%Y-%m-%dT%H:%M:%SZ' > LAST_RUN
+
+      - name: 提交
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/cal_traditional.ics LAST_RUN
+          git commit -m "chore: refresh calendar ($(cat LAST_RUN))"
+          git push
