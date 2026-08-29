@@ -132,6 +132,10 @@ python3 scripts/filter.py upstream.ics docs/cal_traditional.ics
 
 无第三方依赖，Python 3.9+ 即可。
 
+## 说明
+
+代码和文档均由 Claude Code 生成。如发现错误，敬请指正。
+
 ## 许可证
 
 代码以 MIT 发布，见 [LICENSE](LICENSE)。
