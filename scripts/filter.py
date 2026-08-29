@@ -65,11 +65,11 @@ def main(src_path: str, dst_path: str) -> int:
     for old, new in RENAMES:
         text = text.replace(old, new)
     text = text.replace(
-        "X-WR-CALNAME:中华人民共和国节日纪念日日历", "X-WR-CALNAME:中国传统节日"
+        "X-WR-CALNAME:中华人民共和国节日纪念日日历", "X-WR-CALNAME:中华传统节日"
     )
     text = re.sub(
         r"X-WR-CALDESC:[^\r\n]*",
-        "X-WR-CALDESC:中国传统节日（不含现代纪念日）· 数据来自 YangH9/ChinaCalendar",
+        "X-WR-CALDESC:中华传统节日（不含现代纪念日）· 数据来自 YangH9/ChinaCalendar",
         text,
     )
 

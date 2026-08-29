@@ -3,9 +3,9 @@ PRODID:-//YangH9//China Calendar//CN
 VERSION:2.0
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-X-WR-CALNAME:中国传统节日
+X-WR-CALNAME:中华传统节日
 X-WR-TIMEZONE:Asia/Shanghai
-X-WR-CALDESC:中国传统节日（不含现代纪念日）· 数据来自 YangH9/ChinaCalendar
+X-WR-CALDESC:中华传统节日（不含现代纪念日）· 数据来自 YangH9/ChinaCalendar
 BEGIN:VTIMEZONE
 TZID:Asia/Shanghai
 X-LIC-LOCATION:Asia/Shanghai
